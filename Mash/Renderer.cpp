@@ -1,4 +1,7 @@
 #include "Renderer.h"
+#include <cstdlib>
+#include <iostream>
+#include <algorithm>
 
 void Renderer::SetPixel(int x, int y, const RGBColor& color)
 {
@@ -12,6 +15,81 @@ void Renderer::SetPixel(int x, int y, const RGBColor& color)
 	uint8_t* row = (uint8_t*)buffer.memory + x * bytesPerPixel + y * buffer.pitch;
 	uint32_t* pixel = (uint32_t*)row;
 	*pixel = colorValue;
+}
+
+void Renderer::FillGradient(const POINT& start, const POINT& end, const RGBColor& color1, const RGBColor& color2)  
+{
+   BitmapBuffer& buffer = getInstance().buffer;
+
+   int minX = start.x;
+   int minY = start.y;
+   int maxX = buffer.width;
+   int maxY = buffer.height;
+
+   /*
+   int maxX = end.x;
+   int maxY = end.y;
+   */
+
+   if (minX < 0) minX = 0;
+   if (minY < 0) minY = 0;
+   if (maxX > buffer.width) maxX = buffer.width;
+   if (maxY > buffer.height) maxY = buffer.height;
+
+   uint8_t* row = (uint8_t*)buffer.memory + minX * bytesPerPixel + minY * buffer.pitch;
+
+   for (int y = minY; y < maxY; y++)
+   {
+	   uint32_t* pixel = (uint32_t*)row;
+	   for (int x = minX; x < maxX; x++)
+	   {
+		   float imageX = (float)x / (float)buffer.width;
+		   float imageY = (float)y / (float)buffer.width;
+
+		   
+		   std::cout << "Start: (" << start.x << ", " << start.y << ")  End: (" << end.x << ", " << end.y << ")" << std::endl;
+		   std::cout << start.x << "/" << (float)buffer.width << " = " << start.x / (float)buffer.width << ", " << start.y << "/" << (float)buffer.height << " = " << start.y / (float)buffer.height << std::endl;
+		   std::cout << end.x << "/" << (float)buffer.width << " = " << end.x / (float)buffer.width  << ", " << end.y << "/" << (float)buffer.height << " = " << end.y / (float)buffer.height << std::endl;
+		   
+		   float startX = start.x;
+		   float startY = start.y;
+		   float endX = end.x;
+		   float endY = end.y;
+
+		   POINT normalizedStart = { startX / (float)buffer.width, startY / (float)buffer.height}; // normalize the x and y value for start coords
+		   POINT normalizedEnd = { endX / (float)buffer.width, endY / (float)buffer.height }; // normalize the x and y value for the end coords
+
+
+		   std::cout << "normalizedStart.x: " << normalizedStart.x << ", normalizedStart.y: " << normalizedStart.y << std::endl; 
+		   std::cout << "normalizedEnd.x: " << normalizedEnd.x << ", normalizedEnd.y: " << normalizedEnd.y << std::endl;
+
+
+		   POINT direction = { normalizedEnd.x - normalizedStart.x, normalizedEnd.y - normalizedStart.y }; // combine points to get a normalized point
+
+		   float mod = 1.0f / (direction.x * direction.x + direction.y * direction.y); // get normalized float value of direction
+
+		   float gradientPos = ((imageX - normalizedStart.x) * direction.x + (imageY - normalizedStart.y) * direction.y) * mod;
+
+		   float magnitude = std::clamp(gradientPos, 0.0f, 1.0f);
+
+		   /*
+		   std::cout << "direction.x: " << direction.x << ", direction.y: " << direction.y << std::endl;
+		   std::cout << "normalizedStart.x: " << normalizedStart.x << ", normalizedStart.y: " << normalizedStart.y << std::endl;
+		   std::cout << "normalizedEnd.x: " << normalizedEnd.x << ", normalizedEnd.y: " << normalizedEnd.y << std::endl;
+		   std::cout << "imageX: " << imageX << ", imageY: " << imageY << std::endl;
+		   std::cout << "grandPos: " << gradientPos << ", magnitude: " << magnitude << std::endl;
+		   */
+
+		   int red = color1.red + (color2.red - color1.red) * magnitude;
+		   int green = color1.green + (color2.green - color1.green) * magnitude;
+		   int blue = color1.blue + (color2.blue - color1.blue) * magnitude;
+
+		   uint32_t color = (red << 16) | (green << 8) | (blue << 0);
+
+		   *pixel++ = color;
+	   }
+	   row += buffer.pitch;
+   }
 }
 
 void Renderer::FillRect(const Rect& rect, const RGBColor& color)
@@ -40,6 +118,11 @@ void Renderer::FillRect(const Rect& rect, const RGBColor& color)
 		}
 		row += buffer.pitch;
 	}
+}
+
+void Renderer::FillRoundedRect(const RoundedRect& roundedRect, const RGBColor& color)
+{
+	BitmapBuffer& buffer = getInstance().buffer;
 }
 
 void Renderer::getWindowDimensions(int* width, int* height)

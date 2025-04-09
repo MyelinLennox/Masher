@@ -24,6 +24,7 @@
     <ProjectGuid>{f11791ae-f75a-455b-b6b0-c270c2e8947d}</ProjectGuid>
     <RootNamespace>Mash</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Masher</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

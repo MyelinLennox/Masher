@@ -55,10 +55,10 @@ Window::Window() : m_hInstance(GetModuleHandle(nullptr))
 
 	RECT rect 
 	{ 
-		0,
-		0, 
-		1200, 
-		800 
+		0,     // left
+		0,     // top
+		1200,  // right
+		800    // bottom
 	};
 
 	Renderer::resizeFrameBuffer(rect.right, rect.bottom);
@@ -71,7 +71,7 @@ Window::Window() : m_hInstance(GetModuleHandle(nullptr))
 	m_hWnd = CreateWindowEx(
 		0,
 		CLASS_NAME,
-		L"MASH!",
+		L"MASHER!",
 		style,
 		(screenWidth - width) / 2,
 		(screenHeight - height) / 2,
