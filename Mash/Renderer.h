@@ -1,7 +1,12 @@
 #pragma once
 
-#include <windows.h>
+#include <Windows.h>
 #include <stdint.h>
+
+struct FPoint
+{
+	float x, y;
+};
 
 struct RGBColor
 {
@@ -19,7 +24,7 @@ struct Rect
 	int x, y, width, height;
 };
 
-struct RoundedRect // yes i know RoundRect is a WinAPI function, i refuse to use it.
+struct RoundedRect // conflict with win api "RoundRect", simple rename works for now, fix later
 {
 	int x, y, width, height, radius;
 };
@@ -51,19 +56,21 @@ private:
 	RGBColor clearColor;
 
 public:
-	inline static void SetClearColor(const RGBColor& color) { getInstance().clearColor = color; }
+	static void setClearColor(const RGBColor& color);
 
-	static void SetPixel(int x, int y, const RGBColor& color);
+	static void setPixel(int x, int y, const RGBColor& color);
 
-	static void FillRect(const Rect& rect, const RGBColor& color);
+	static void fillRect(const Rect& rect, const RGBColor& color);
 
-	static void FillRoundedRect(const RoundedRect& roundedRect, const RGBColor& color);
+	static void fillRoundedRect(const RoundedRect& roundedRect, const RGBColor& color);
 
-	static void FillGradient(const POINT& start, const POINT& end, const RGBColor& color1, const RGBColor& color2);
+	static void fillGradient(const Rect& rect, const RGBColor& color1, const RGBColor& color2);
 
 
 private:
+	
 	Renderer() : hWnd(nullptr) { buffer = {}; clearColor = { 255,255,255 }; }
+	//Renderer() { buffer = {}; clearColor = { 255, 255, 255 }; }
 
 	Renderer(const Renderer&) = delete;
 	Renderer& operator = (const Renderer&) = delete;
@@ -86,6 +93,5 @@ public:
 	static void copyBufferToWindow(HDC deviceContext, int windowWidth, int windowHeight);
 
 	static void clearBuffer();
-
 };
 

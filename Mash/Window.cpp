@@ -8,17 +8,17 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) 
 	{
 	case WM_CLOSE:
-		std::cout << "WM_CLOSE called" << std::endl;
+		std::cout << "(Window.cpp) -- WM_CLOSE called" << std::endl;
 		DestroyWindow(hWnd);
 		break;
 
 	case WM_DESTROY:
-		std::cout << "WM_DESTROY called" << std::endl;
+		std::cout << "(Window.cpp) -- WM_DESTROY called" << std::endl;
 		PostQuitMessage(0);
 		return 0;
 	
 	case WM_PAINT:
-		std::cout << "WM_PAINT called" << std::endl;
+		std::cout << "(Window.cpp) -- WM_PAINT called" << std::endl;
 
 		PAINTSTRUCT paint;
 		HDC deviceContext = BeginPaint(hWnd, &paint);
@@ -36,8 +36,8 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 Window::Window() : m_hInstance(GetModuleHandle(nullptr))
 {
-	std::cout << "m_hInstance initialization started" << std::endl;
-	const wchar_t* CLASS_NAME = L"Window Class";
+	std::cout << "(Window.cpp) -- m_hInstance initialization started" << std::endl;
+	const wchar_t* CLASS_NAME = L"(Window.cpp) -- Window Class";
 
 	WNDCLASS wndClass = {};
 	wndClass.lpszClassName = CLASS_NAME;
@@ -53,7 +53,7 @@ Window::Window() : m_hInstance(GetModuleHandle(nullptr))
 	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-	RECT rect 
+	RECT windowSize 
 	{ 
 		0,     // left
 		0,     // top
@@ -61,12 +61,12 @@ Window::Window() : m_hInstance(GetModuleHandle(nullptr))
 		800    // bottom
 	};
 
-	Renderer::resizeFrameBuffer(rect.right, rect.bottom);
+	Renderer::resizeFrameBuffer(windowSize.right, windowSize.bottom);
 
-	int width = rect.right - rect.left;
-	int height = rect.bottom - rect.top;
+	int width = windowSize.right - windowSize.left;
+	int height = windowSize.bottom - windowSize.top;
 
-	AdjustWindowRect(&rect, style, FALSE); // fix window size so dimensions apply to canvas instead of border
+	AdjustWindowRect(&windowSize, style, FALSE); // fix window size so dimensions apply to canvas instead of border
 
 	m_hWnd = CreateWindowEx(
 		0,
@@ -85,7 +85,7 @@ Window::Window() : m_hInstance(GetModuleHandle(nullptr))
 
 	ShowWindow(m_hWnd, SW_SHOW);
 
-	std::cout << "m_hWnd window created" << std::endl;
+	std::cout << "(Window.cpp) -- m_hWnd window created" << std::endl;
 	
 	Renderer::setWindowHandle(m_hWnd);
 }
@@ -95,24 +95,27 @@ Window::~Window()
 	const wchar_t* CLASS_NAME = L"Window Class";
 	UnregisterClass(CLASS_NAME, m_hInstance);
 
-	std::cout << "Window class unregistered" << std::endl;
+	std::cout << "(Window.cpp) -- Window class unregistered" << std::endl;
 }
 
 void Window::Render()
 {
-	Renderer::clearBuffer();
+	std::cout << "(Window.cpp) -- Render() called" << std::endl;
+
+	LARGE_INTEGER current_counter;
+	QueryPerformanceCounter(&current_counter);
+
 
 	HDC deviceContext = GetDC(m_hWnd);
 
-	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-
-	Renderer::copyBufferToWindow(deviceContext, screenWidth, screenHeight);
+	int width, height;
+	Renderer::getWindowDimensions(&width, &height);
+	Renderer::copyBufferToWindow(deviceContext, width, height);
 
 	ReleaseDC(m_hWnd, deviceContext);
 }
 
-bool Window::ProcessMessages()
+bool Window::processMessages()
 {
 
 	MSG msg = {};
@@ -126,7 +129,7 @@ bool Window::ProcessMessages()
 
 		if (msg.message == WM_KEYDOWN)
 		{
-			std::cout << "Key pressed: " << msg.wParam << std::endl;
+			std::cout << "(Window.cpp) -- Key pressed: " << msg.wParam << std::endl;
 		}
 
 		TranslateMessage(&msg);
