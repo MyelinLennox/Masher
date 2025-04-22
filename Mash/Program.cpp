@@ -28,36 +28,8 @@ int main()
 	LARGE_INTEGER lastCounter;
 	QueryPerformanceCounter(&lastCounter);
 
-	std::mt19937 generator(std::time(nullptr));
-
-	std::uniform_int_distribution<int> intDistribution1(1, 255);
-	std::uniform_int_distribution<int> intDistribution2(1, 255);
-	std::uniform_int_distribution<int> intDistribution3(1, 255);
-
-	int randomInt1 = intDistribution1(generator);
-	int randomInt2 = intDistribution2(generator);
-	int randomInt3 = intDistribution3(generator);
-
-	std::uniform_int_distribution<int> intDistribution4(1, 255);
-	std::uniform_int_distribution<int> intDistribution5(1, 255);
-	std::uniform_int_distribution<int> intDistribution6(1, 255);
-
-	int randomInt4 = intDistribution4(generator);
-	int randomInt5 = intDistribution5(generator);
-	int randomInt6 = intDistribution6(generator);
-
-	int tenth = 0;
-
 	while (running)
 	{
-		randomInt1++;
-		randomInt2++;
-		randomInt3++;
-		randomInt4++;
-		randomInt5++;
-		randomInt6++;
-		
-		tenth++;
 
 		LARGE_INTEGER currentCounter;
 		QueryPerformanceCounter(&currentCounter);
@@ -87,7 +59,7 @@ int main()
 
 					Renderer::fillRect({ 150,150,150,150 }, { 0,255,0 });
 
-					Renderer::fillGradient({ 450,150,150,150 }, { uint8_t(randomInt1),uint8_t(randomInt2),uint8_t(randomInt3) }, { uint8_t(randomInt4),uint8_t(randomInt5),uint8_t(randomInt6) });
+					Renderer::fillGradient({ 450,150,150,150 }, { 255,0,0 }, { 0, 0, 255 });
 			});
 
 			Renderer::setClearColor({ 0, 0, 0 });
